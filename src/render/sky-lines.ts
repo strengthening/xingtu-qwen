@@ -53,7 +53,12 @@ export class SkyLines {
     scene: THREE.Scene,
     uniforms: SkyUniforms,
     segments: Float32Array,
-    options: { color: THREE.ColorRepresentation; opacity: number; clipHorizon: boolean; renderOrder: number },
+    options: {
+      color: THREE.ColorRepresentation;
+      opacity: number;
+      clipHorizon: boolean;
+      renderOrder: number;
+    },
   ) {
     this.dirToSky = { value: new THREE.Matrix3() };
     this.material = new THREE.ShaderMaterial({

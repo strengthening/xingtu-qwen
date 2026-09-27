@@ -1,6 +1,7 @@
 import type { BodyDetail } from '../astro/bodies';
 import type { SkyContext } from '../astro/sky-context';
 import { airMass, equatorialToHorizontal, unitToEquatorial } from '../astro/coordinates';
+import { equatorialOfDateMatrix } from '../astro/frames';
 import { mulMatVec } from '../astro/vector';
 import type { StarName } from '../data/manifest';
 import type { PickedStar } from '../render/star-field';
@@ -16,7 +17,10 @@ import {
   formatRa,
 } from './format';
 
-function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = ''): HTMLElementTagNameMap[K] {
+function el<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className = '',
+): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag);
   if (className) node.className = className;
   return node;
@@ -40,34 +44,56 @@ export class InfoCard {
     this.root.replaceChildren();
   }
 
-  showStar(star: PickedStar, name: StarName | undefined, context: SkyContext, gaiaId: bigint | null): void {
-    const ofDate = unitToEquatorial(mulMatVec(context.skyMatrix, star.directionEqj));
+  showStar(
+    star: PickedStar,
+    name: StarName | undefined,
+    context: SkyContext,
+    gaiaId: bigint | null,
+  ): void {
+    const eqj = unitToEquatorial(star.directionEqj);
+    const ofDate = unitToEquatorial(
+      mulMatVec(equatorialOfDateMatrix(context.date), star.directionEqj),
+    );
     const horizontal = equatorialToHorizontal(
       context.date,
       context.site,
-      ofDate.raHours,
-      ofDate.decDeg,
+      eqj.raHours,
+      eqj.decDeg,
     );
     const rows: Array<[string, string]> = [
       ['视星等 (G)', formatMagnitude(star.magnitude)],
       ['色指数 B−V', Number.isFinite(star.bv) && star.bv > -900 ? star.bv.toFixed(3) : '—'],
       ['赤经 / 赤纬', `${formatRa(ofDate.raHours)} / ${formatDec(ofDate.decDeg)}`],
       ['方位 / 高度', `${formatAzimuth(horizontal.azDeg)} / ${formatAltitude(horizontal.altDeg)}`],
-      ['大气质量', Number.isFinite(airMass(horizontal.altDeg)) ? airMass(horizontal.altDeg).toFixed(2) : '地平线下'],
+      [
+        '大气质量',
+        Number.isFinite(airMass(horizontal.altDeg))
+          ? airMass(horizontal.altDeg).toFixed(2)
+          : '地平线下',
+      ],
       ['距离', formatParallaxDistance(star.parallaxMas)],
       ['自行', formatProperMotion(star.pmRa, star.pmDec)],
     ];
     if (gaiaId !== null) rows.push(['Gaia DR3', gaiaId.toString()]);
     if (name?.hip) rows.push(['HIP', String(name.hip)]);
     if (name?.con) rows.push(['星座', name.con]);
-    this.render(name?.nameZh ?? name?.name ?? '未命名恒星', name?.nameZh ? name.name : name?.desig, rows);
+    this.render(
+      name?.nameZh ?? name?.name ?? '未命名恒星',
+      name?.nameZh ? name.name : name?.desig,
+      rows,
+    );
   }
 
   showBody(body: BodyDetail, context: SkyContext): void {
     const rows: Array<[string, string]> = [
       ['视星等', formatMagnitude(body.magnitude)],
       ['相位', body.phaseFraction === null ? '—' : `${(body.phaseFraction * 100).toFixed(0)}%`],
-      ['视半径', body.apparentRadiusDeg >= 0.01 ? `${(body.apparentRadiusDeg * 60).toFixed(1)}′` : `${(body.apparentRadiusDeg * 3600).toFixed(1)}″`],
+      [
+        '视半径',
+        body.apparentRadiusDeg >= 0.01
+          ? `${(body.apparentRadiusDeg * 60).toFixed(1)}′`
+          : `${(body.apparentRadiusDeg * 3600).toFixed(1)}″`,
+      ],
       ['赤经 / 赤纬', `${formatRa(body.raHours)} / ${formatDec(body.decDeg)}`],
       ['方位 / 高度', `${formatAzimuth(body.azDeg)} / ${formatAltitude(body.altDeg)}`],
       ['距离', formatDistance(body.distanceAu)],

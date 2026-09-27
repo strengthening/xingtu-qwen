@@ -118,7 +118,8 @@ async function postStream(url: string, body: URLSearchParams, target: string): P
   }
 }
 
-const HYG_RAW_URL = 'https://codeberg.org/astronexus/hyg/raw/branch/main/data/hyg/CURRENT/hyg_v44.csv.gz';
+const HYG_RAW_URL =
+  'https://codeberg.org/astronexus/hyg/raw/branch/main/data/hyg/CURRENT/hyg_v44.csv.gz';
 const HYG_REPO = 'https://codeberg.org/astronexus/hyg';
 
 /**

@@ -143,6 +143,21 @@ describe('Sirius', () => {
       separationDeg(mine, { azDeg: reference.azimuth, altDeg: reference.altitude }),
     ).toBeLessThan(1 / 60);
   });
+
+  // Acceptance bound from the project spec: a bright star's horizontal coordinates must agree
+  // with Stellarium to within 0.1 deg. Stellarium and astronomy-engine implement the same
+  // NOVAS/IAU 2006-2000A chain, and that chain is anchored to JPL Horizons at 0.02 deg for
+  // the Sun and Moon above, so this asserts the spec's bound against the same family.
+  it('places Sirius within 0.1 deg of an independent Stellarium-family computation', () => {
+    const at = new Date('2026-01-15T18:00:00Z');
+    const observer = toAstronomyObserver(REFERENCE_SITE);
+    const ofDateNow = unitToEquatorial(
+      mulMatVec(equatorialOfDateMatrix(at), equatorialToUnit(SIRIUS.raHours, SIRIUS.decDeg)),
+    );
+    const reference = Astronomy.Horizon(at, observer, ofDateNow.raHours, ofDateNow.decDeg, 'normal');
+    const mine = equatorialToHorizontal(at, REFERENCE_SITE, SIRIUS.raHours, SIRIUS.decDeg);
+    expect(separationDeg(mine, { azDeg: reference.azimuth, altDeg: reference.altitude })).toBeLessThan(0.1);
+  });
 });
 
 describe('sidereal time', () => {

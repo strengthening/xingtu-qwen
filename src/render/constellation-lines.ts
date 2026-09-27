@@ -25,23 +25,35 @@ export class ConstellationLines {
     western: ConstellationItem[],
     chinese: ConstellationItem[],
   ) {
-    this.western = new SkyLines(scene, uniforms, segmentsFromPolylines(western.flatMap((c) => c.lines)), {
-      color: 0x4a6fa8,
-      opacity: 0.55,
-      clipHorizon: true,
-      renderOrder: 5,
-    });
-    this.chinese = new SkyLines(scene, uniforms, segmentsFromPolylines(chinese.flatMap((c) => c.lines)), {
-      color: 0xa86f4a,
-      opacity: 0.5,
-      clipHorizon: true,
-      renderOrder: 5,
-    });
+    this.western = new SkyLines(
+      scene,
+      uniforms,
+      segmentsFromPolylines(western.flatMap((c) => c.lines)),
+      {
+        color: 0x4a6fa8,
+        opacity: 0.55,
+        clipHorizon: true,
+        renderOrder: 5,
+      },
+    );
+    this.chinese = new SkyLines(
+      scene,
+      uniforms,
+      segmentsFromPolylines(chinese.flatMap((c) => c.lines)),
+      {
+        color: 0xa86f4a,
+        opacity: 0.5,
+        clipHorizon: true,
+        renderOrder: 5,
+      },
+    );
     for (const item of western) {
       this.westernLabels.push(label(item.nameZh ?? item.name, item.name, item.label));
     }
     for (const item of chinese) {
-      this.chineseLabels.push(label(item.name, item.pinyin || item.nameEn || undefined, item.label));
+      this.chineseLabels.push(
+        label(item.name, item.pinyin || item.nameEn || undefined, item.label),
+      );
     }
   }
 
@@ -59,7 +71,11 @@ export class ConstellationLines {
   }
 }
 
-function label(text: string, subText: string | undefined, anchor: [number, number]): ConstellationLabel {
+function label(
+  text: string,
+  subText: string | undefined,
+  anchor: [number, number],
+): ConstellationLabel {
   const sub = subText && subText !== text ? subText : undefined;
   return {
     text,

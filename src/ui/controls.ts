@@ -104,7 +104,9 @@ export class ControlPanel {
     elevField.append(elevation);
     elevRow.append(elevField);
     siteBody.append(latRow, lonRow, elevRow);
-    siteBody.append(el('p', 'hint', '南半球的星空与北半球不同：切到南半球预设点看看南天极与麦哲伦云方向。'));
+    siteBody.append(
+      el('p', 'hint', '南半球的星空与北半球不同：切到南半球预设点看看南天极与麦哲伦云方向。'),
+    );
 
     const [timePanel, timeBody] = panel('时间');
     const [timeRow, timeField] = row('当地时间');
@@ -169,11 +171,25 @@ export class ControlPanel {
     const [sharePanel, shareBody] = panel('分享');
     const shareButton = el('button', '', '复制当前视角与时间链接');
     shareBody.append(shareButton);
-    shareBody.append(el('p', 'hint', '链接包含时间、地点、朝向与视场，可直接发给别人复现同一片天空。'));
+    shareBody.append(
+      el('p', 'hint', '链接包含时间、地点、朝向与视场，可直接发给别人复现同一片天空。'),
+    );
 
     this.rightColumn.append(displayPanel, atmoPanel, sharePanel);
 
-    this.wire(siteSelect, latitude, longitude, elevation, timeInput, rateSelect, nowButton, frameSelect, density, toggles, shareButton);
+    this.wire(
+      siteSelect,
+      latitude,
+      longitude,
+      elevation,
+      timeInput,
+      rateSelect,
+      nowButton,
+      frameSelect,
+      density,
+      toggles,
+      shareButton,
+    );
 
     return {
       siteSelect,
@@ -241,7 +257,9 @@ export class ControlPanel {
       store.set({ atmosphereDensity: Number(density.value) / 100 });
     });
     for (const [key, input] of Object.entries(toggles)) {
-      input!.addEventListener('change', () => store.setToggle(key as keyof Toggles, input!.checked));
+      input!.addEventListener('change', () =>
+        store.setToggle(key as keyof Toggles, input!.checked),
+      );
     }
     shareButton.addEventListener('click', () => this.onShare());
   }

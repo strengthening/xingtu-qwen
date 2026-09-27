@@ -41,11 +41,7 @@ export class SkyCamera {
       this.upReference[2] - this.forward[2] * dot(this.upReference, this.forward),
     ]);
     if (dot(up, up) < 1e-6) {
-      up = normalize([
-        -this.forward[1],
-        this.forward[0],
-        0,
-      ]);
+      up = normalize([-this.forward[1], this.forward[0], 0]);
       if (dot(up, up) < 1e-6) up = [1, 0, 0];
     }
     if (this.roll !== 0) up = normalize(rotateAbout(this.forward, this.roll, up));

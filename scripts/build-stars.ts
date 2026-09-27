@@ -468,7 +468,9 @@ async function main(): Promise<void> {
   for (const band of BANDS) {
     const bandBuckets = [...buckets.entries()]
       .filter(([key]) => key.startsWith(band.key))
-      .sort(([a], [b]) => (band.order === null ? 0 : pixelOfChunk(band, a) - pixelOfChunk(band, b)));
+      .sort(([a], [b]) =>
+        band.order === null ? 0 : pixelOfChunk(band, a) - pixelOfChunk(band, b),
+      );
     if (bandBuckets.length === 0) continue;
     let stars = 0;
     let bytes = 0;
@@ -488,7 +490,11 @@ async function main(): Promise<void> {
       bytes += floats.byteLength + ids.byteLength;
       stats.push([relative, bucket.ids.length, floats.byteLength]);
       if (band.order !== null) {
-        tiles.push({ pixel: pixelOfChunk(band, key), stars: bucket.ids.length, bytes: floats.byteLength });
+        tiles.push({
+          pixel: pixelOfChunk(band, key),
+          stars: bucket.ids.length,
+          bytes: floats.byteLength,
+        });
       }
     }
     manifestBands.push({

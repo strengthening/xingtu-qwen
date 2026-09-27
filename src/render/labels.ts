@@ -24,7 +24,13 @@ export class LabelLayer {
 
   constructor(private readonly container: HTMLElement) {}
 
-  update(items: LabelItem[], context: SkyContext, camera: SkyCamera, width: number, height: number): void {
+  update(
+    items: LabelItem[],
+    context: SkyContext,
+    camera: SkyCamera,
+    width: number,
+    height: number,
+  ): void {
     const skyToView = camera.skyToView();
     const projScale = projectionScale(camera.fovDeg);
     const aspect = width / Math.max(height, 1);
@@ -44,7 +50,8 @@ export class LabelLayer {
           context.skyMatrix[8] * item.dirEqj[2],
       ] as Vec3;
       const projected = projectDirection(sky, skyToView, projScale, aspect);
-      if (projected.behind || Math.abs(projected.x) > 1.02 || Math.abs(projected.y) > 1.02) continue;
+      if (projected.behind || Math.abs(projected.x) > 1.02 || Math.abs(projected.y) > 1.02)
+        continue;
       const el = this.element();
       el.className = `sky-label is-${item.kind}`;
       const text = item.subText ? `${item.text} ${item.subText}` : item.text;
