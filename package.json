@@ -7,9 +7,9 @@
   "description": "浏览器端星空 / 天象仪：基于 Three.js 的立体投影天球，使用 Gaia 星表与 astronomy-engine 天文计算",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

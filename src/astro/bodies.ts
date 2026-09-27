@@ -76,15 +76,32 @@ export interface BodyPosition {
   azDeg: number;
   altDeg: number;
   apparentRadiusDeg: number;
+  magnitude: number;
+  phaseFraction: number | null;
 }
 
 /** Everything the info card needs, including the expensive rise/set search. */
 export interface BodyDetail extends BodyPosition {
-  magnitude: number;
-  phaseFraction: number | null;
   sunSeparationDeg: number;
   rise: Date | null;
   set: Date | null;
+}
+
+const photometryCache = new Map<string, { magnitude: number; phaseFraction: number | null }>();
+
+/** Memoized photometry: apparent magnitudes drift over hours, not per frame. */
+export function photometryCached(
+  body: SolarSystemBody,
+  date: Date,
+  distanceAu: number,
+): { magnitude: number; phaseFraction: number | null } {
+  const key = `${body.id}@${Math.floor(date.getTime() / 600000)}`;
+  const cached = photometryCache.get(key);
+  if (cached) return cached;
+  const value = photometry(body, date, distanceAu);
+  if (photometryCache.size > 512) photometryCache.clear();
+  photometryCache.set(key, value);
+  return value;
 }
 
 /**
@@ -104,6 +121,7 @@ export function bodyPosition(
   const directionEqj = normalize(equatorialToUnit(equ.ra, equ.dec));
   const distanceAu = Math.max(equ.dist, 1e-12);
   const horizontal = unitToHorizontal(mulMatVec(equToHor, directionEqj));
+  const { magnitude, phaseFraction } = photometryCached(body, date, distanceAu);
   return {
     source: body,
     directionEqj,
@@ -113,6 +131,8 @@ export function bodyPosition(
     azDeg: horizontal.azDeg,
     altDeg: horizontal.altDeg,
     apparentRadiusDeg: Math.asin(clamp(body.radiusKm / (distanceAu * AU_KM), -1, 1)) * RAD || 0,
+    magnitude,
+    phaseFraction,
   };
 }
 
@@ -163,7 +183,6 @@ export function riseSet(
 export function describeBody(body: SolarSystemBody, date: Date, site: ObserverSite): BodyDetail {
   const equToHor = skyMatrix(date, site, 'horizontal');
   const position = bodyPosition(body, date, site, equToHor);
-  const { magnitude, phaseFraction } = photometry(body, date, position.distanceAu);
   const sun = Astronomy.Equator(Astronomy.Body.Sun, date, toAstronomyObserver(site), false, true);
   const sunDirection = equatorialToUnit(sun.ra, sun.dec);
   const sunSeparationDeg =
@@ -176,5 +195,5 @@ export function describeBody(body: SolarSystemBody, date: Date, site: ObserverSi
         1,
       ),
     ) * RAD;
-  return { ...position, magnitude, phaseFraction, sunSeparationDeg, ...riseSet(body, date, site) };
+  return { ...position, sunSeparationDeg, ...riseSet(body, date, site) };
 }

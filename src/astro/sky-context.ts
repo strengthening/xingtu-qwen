@@ -1,7 +1,5 @@
-import * as Astronomy from 'astronomy-engine';
-
 import { computeAtmosphere, type AtmosphereModel } from './atmosphere';
-import { MOON, allBodyPositions, type BodyPosition } from './bodies';
+import { allBodyPositions, type BodyPosition } from './bodies';
 import { localSiderealTimeHours } from './coordinates';
 import {
   aberrationVector,
@@ -34,6 +32,8 @@ export interface SkyContext {
   daysSinceJ2000: number;
   lstHours: number;
   bodies: BodyPosition[];
+  /** Illuminated fraction of the lunar disc, 0..1. */
+  moonPhase: number;
   atmosphere: AtmosphereModel;
 }
 
@@ -51,7 +51,7 @@ export function computeSkyContext(params: SkyContextParams): SkyContext {
   const bodies = allBodyPositions(date, site);
   const sun = bodies[0]!;
   const moon = bodies[1]!;
-  const moonIllumination = Astronomy.Illumination(MOON.body, date);
+  const moonPhase = clamp01(moon.phaseFraction ?? 0);
 
   return {
     date,
@@ -64,12 +64,13 @@ export function computeSkyContext(params: SkyContextParams): SkyContext {
     daysSinceJ2000: daysSinceJ2000(date),
     lstHours: localSiderealTimeHours(date, site),
     bodies,
+    moonPhase,
     atmosphere: computeAtmosphere({
       sunAltDeg: sun.altDeg,
       sunDirHor: mulMatVec(equToHor, sun.directionEqj),
       moonAltDeg: moon.altDeg,
       moonDirHor: mulMatVec(equToHor, moon.directionEqj),
-      moonPhase: clamp01(moonIllumination.phase_fraction),
+      moonPhase,
       elevationM: site.elevationM,
       lightPollutionMag: params.lightPollutionMag,
       density: params.atmosphereDensity,

@@ -127,11 +127,7 @@ export function computeAtmosphere(inputs: SkyInputs): AtmosphereModel {
     zenithBrightness: zenith,
     starDimming: starDimmingMag(zenith, density),
     skyColor,
-    skyIntensity:
-      density *
-      (0.35 + 0.65 * daylight) *
-      (0.35 + 0.65 * twilightGlow) *
-      (zenith < DARK_SKY_MAG ? 1 : 0.55),
+    skyIntensity: clamp(density * (0.35 + 0.65 * daylight + 0.5 * twilightGlow), 0, 1),
     moonGlowColor: [0.55, 0.58, 0.66],
     moonGlowIntensity,
     sunDirHor: inputs.sunDirHor,
