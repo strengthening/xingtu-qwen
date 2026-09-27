@@ -63,6 +63,16 @@ export function skyMatrix(date: Date, site: ObserverSite, frame: SkyFrame): Mat3
   return mulMat(equatorialToHorizontalMatrix(date, site), precession);
 }
 
+/** J2000 equatorial → galactic, constant; used by the galactic-framed HiPS layer. */
+export function equatorialToGalacticMatrix(): Mat3 {
+  return toMat3(Astronomy.Rotation_EQJ_GAL());
+}
+
+/** Galactic → J2000 equatorial, constant. */
+export function galacticToEquatorialMatrix(): Mat3 {
+  return toMat3(Astronomy.Rotation_GAL_EQJ());
+}
+
 /** Zenith direction expressed in the sky frame, so shaders can derive altitude. */
 export function zenithInSkyFrame(date: Date, site: ObserverSite, frame: SkyFrame): Vec3 {
   if (frame === 'horizontal') return [0, 0, 1];

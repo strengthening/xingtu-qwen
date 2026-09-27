@@ -6,9 +6,11 @@ import { horizontalToEquatorialMatrix } from '../astro/frames';
 import type { Toggles } from '../ui/store';
 import type { StarCatalog, StarChunk } from '../data/star-chunks';
 import type { ConstellationItem } from '../data/manifest';
+import type { HipsSource } from '../data/hips';
 import { ConstellationLines } from './constellation-lines';
 import { Grids } from './grids';
 import { LabelLayer, type LabelItem } from './labels';
+import { MilkyWayLayer } from './milky-way';
 import { projectionScale } from './projection';
 import type { SkyCamera } from './sky-camera';
 import { createSkyUniforms, updateSkyUniforms, type SkyUniforms } from './sky-uniforms';
@@ -38,6 +40,7 @@ export class SkyScene {
   private readonly grids: Grids;
   private readonly solar: SolarSystemLayer;
   private constellations: ConstellationLines | null = null;
+  private milkyWay: MilkyWayLayer | null = null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -67,6 +70,11 @@ export class SkyScene {
   attachConstellations(western: ConstellationItem[], chinese: ConstellationItem[]): void {
     this.constellations?.dispose(this.scene);
     this.constellations = new ConstellationLines(this.scene, this.uniforms, western, chinese);
+  }
+
+  attachMilkyWay(source: HipsSource): void {
+    this.milkyWay?.dispose();
+    this.milkyWay = new MilkyWayLayer(this.scene, this.uniforms, source);
   }
 
   get constellationLabels(): ConstellationLines | null {
@@ -105,6 +113,7 @@ export class SkyScene {
     this.starField.update(visible);
     this.grids.update(context, toggles.equatorialGrid, toggles.horizontalGrid);
     this.constellations?.update(context, toggles.constellations, true);
+    this.milkyWay?.update(context, camera, toggles.milkyWay, options.nowMs);
     this.solar.update(
       context,
       camera,

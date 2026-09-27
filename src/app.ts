@@ -3,6 +3,7 @@ import { skyMatrix } from './astro/frames';
 import { computeSkyContext, type SkyContext } from './astro/sky-context';
 import { mulMatVec, sphericalToUnit, transpose, type Vec3 } from './astro/vector';
 import { StarCatalog } from './data/star-chunks';
+import { HipsSource } from './data/hips';
 import { loadConstellations, loadManifest, loadNames, type StarName } from './data/manifest';
 import { projectDirection, projectionScale } from './render/projection';
 import { SkyCamera } from './render/sky-camera';
@@ -103,6 +104,8 @@ export class App {
       this.namesByChunkIndex = new Map(names.map((n) => [`${n.chunk}:${n.index}`, n]));
       this.scene = new SkyScene(this.canvas, this.catalog, labelHost);
       this.scene.attachConstellations(constellations.western.items, constellations.chinese.items);
+      const hips = await HipsSource.load('hips/milkyway/').catch(() => null);
+      if (hips) this.scene.attachMilkyWay(hips);
       this.resize();
       window.addEventListener('resize', () => this.resize());
       this.store.set({ loadingMessage: null });
@@ -262,7 +265,8 @@ export class App {
     if (state.selection === null) this.infoCard.hide();
     if (state.selection?.kind === 'body' && this.context) {
       const body = findBody(state.selection.bodyId);
-      if (body) this.infoCard.showBody(describeBody(body, state.time, this.store.site()), this.context);
+      if (body)
+        this.infoCard.showBody(describeBody(body, state.time, this.store.site()), this.context);
     }
   }
 
@@ -271,7 +275,9 @@ export class App {
     if (!context) return;
     const query = encodeState(this.store.get(), this.viewDirEqj(context));
     this.store.set({ shareUrl: `${location.origin}${location.pathname}?${query}` });
-    await navigator.clipboard?.writeText(`${location.origin}${location.pathname}?${query}`).catch(() => undefined);
+    await navigator.clipboard
+      ?.writeText(`${location.origin}${location.pathname}?${query}`)
+      .catch(() => undefined);
     history.replaceState(null, '', `?${query}`);
   }
 
@@ -348,17 +354,25 @@ export class App {
     if (this.frameErrorReported) return;
     this.frameErrorReported = true;
     console.error('渲染帧出错：', error);
-    this.store.set({ loadingMessage: `渲染出错：${error instanceof Error ? error.message : String(error)}` });
+    this.store.set({
+      loadingMessage: `渲染出错：${error instanceof Error ? error.message : String(error)}`,
+    });
   }
 
   private buildLabels(context: SkyContext): LabelItem[] {
     const state = this.store.get();
     const items: LabelItem[] = [];
-    if (state.toggles.cardinalPoints && this.scene) items.push(...this.scene.cardinalLabels(context));
+    if (state.toggles.cardinalPoints && this.scene)
+      items.push(...this.scene.cardinalLabels(context));
     if (state.toggles.solarSystem) {
       for (const body of context.bodies) {
         if (body.altDeg < -3) continue;
-        items.push({ text: body.source.nameZh, dirEqj: body.directionEqj, kind: 'body', priority: -5 });
+        items.push({
+          text: body.source.nameZh,
+          dirEqj: body.directionEqj,
+          kind: 'body',
+          priority: -5,
+        });
       }
     }
     if (state.toggles.starLabels) {
@@ -416,7 +430,10 @@ function starSelection(star: PickedStar): StarSelection {
   };
 }
 
-function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = ''): HTMLElementTagNameMap[K] {
+function el<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className = '',
+): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag);
   if (className) node.className = className;
   return node;

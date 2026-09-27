@@ -34,6 +34,8 @@ export interface SkyContext {
   bodies: BodyPosition[];
   /** Illuminated fraction of the lunar disc, 0..1. */
   moonPhase: number;
+  /** Extra sky brightness of the site, in magnitudes; dims the Milky Way and dark-sky look. */
+  lightPollutionMag: number;
   atmosphere: AtmosphereModel;
 }
 
@@ -65,6 +67,7 @@ export function computeSkyContext(params: SkyContextParams): SkyContext {
     lstHours: localSiderealTimeHours(date, site),
     bodies,
     moonPhase,
+    lightPollutionMag: params.lightPollutionMag,
     atmosphere: computeAtmosphere({
       sunAltDeg: sun.altDeg,
       sunDirHor: mulMatVec(equToHor, sun.directionEqj),
