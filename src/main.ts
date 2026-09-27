@@ -3,11 +3,11 @@ import './styles.css';
 import { App } from './app';
 
 function boot(): void {
-  const ui = document.getElementById('ui');
-  if (!ui) throw new Error('missing #ui container');
-  const app = new App(ui);
-  app.start();
-  (window as unknown as { xingtu: App }).xingtu = app;
+  const app = document.getElementById('app');
+  if (!app) throw new Error('missing #app container');
+  const application = new App(app);
+  application.start();
+  (window as unknown as { xingtu: App }).xingtu = application;
 }
 
 function showBootError(error: unknown): void {

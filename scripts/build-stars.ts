@@ -16,7 +16,7 @@
  */
 import { createReadStream } from 'node:fs';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
-import { Readable } from 'node:stream';
+import type { Readable } from 'node:stream';
 import { createGunzip } from 'node:zlib';
 
 import { bpRpToBv } from '../src/astro/colors';
@@ -50,11 +50,11 @@ interface Band {
 const BANDS: Band[] = [
   { key: 'band-0', min: -99, max: 4, order: null, showBelowFov: 360 },
   { key: 'band-1', min: 4, max: 6, order: null, showBelowFov: 360 },
-  { key: 'band-2', min: 6, max: 8, order: null, showBelowFov: 360 },
-  { key: 'band-3', min: 8, max: 9, order: 1, showBelowFov: 90 },
-  { key: 'band-4', min: 9, max: 10, order: 2, showBelowFov: 45 },
-  { key: 'band-5', min: 10, max: 11, order: 3, showBelowFov: 20 },
-  { key: 'band-6', min: 11, max: 12, order: 3, showBelowFov: 8 },
+  { key: 'band-2', min: 6, max: 8, order: null, showBelowFov: 45 },
+  { key: 'band-3', min: 8, max: 9, order: 1, showBelowFov: 20 },
+  { key: 'band-4', min: 9, max: 10, order: 2, showBelowFov: 8 },
+  { key: 'band-5', min: 10, max: 11, order: 3, showBelowFov: 3 },
+  { key: 'band-6', min: 11, max: 12, order: 3, showBelowFov: 1.2 },
 ];
 
 interface Bucket {
