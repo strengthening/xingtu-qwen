@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <title>星图 · Xingtu — 浏览器天象仪</title>
+    <meta
+      name="description"
+      content="基于 Three.js 与 Gaia 星表的浏览器端星空 / 天象仪，支持立体投影、日月行星、星座连线与大气效果。"
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="sky"></canvas>
+      <div id="ui"></div>
+    </div>
+    <div id="boot-error" hidden></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

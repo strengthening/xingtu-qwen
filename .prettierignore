@@ -1,0 +1,6 @@
+.prettierignore
+node_modules
+dist
+coverage
+data/raw
+public/data

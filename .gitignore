@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# 原始数据与预处理产物：体积大，不入版本库（用 pnpm data:download / pnpm data:build 生成）
+data/raw/
+public/data/
+!public/data/manifest.json
+!public/data/README.md
+
+*.log
+.env
+.env.*
+.DS_Store
