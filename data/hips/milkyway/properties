@@ -1,0 +1,13 @@
+obs_title          = The Milky Way panorama (local HiPS)
+obs_collection     = ESO Milky Way panorama
+obs_copyright      = ESO/S. Brunier (CC BY 4.0)
+dataproduct_type   = image
+hips_frame         = galactic
+hips_order         = 3
+hips_tile_width    = 256
+hips_tile_format   = jpeg
+hips_version       = 1.4
+hips_status        = private master
+hips_creation_date = 2026-09-27T02:00:42.345Z
+hips_builder       = xingtu scripts/build-milkyway.ts
+moc_sky_fraction   = 1
